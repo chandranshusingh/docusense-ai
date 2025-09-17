@@ -214,3 +214,15 @@ site/
 *.backup
 *.old
 *~
+
+# ========================
+# Project-Specific Exclusions
+# ========================
+# Documentation directory
+docs/
+
+# GitHub setup guide
+GITHUB_SETUP.md
+
+# Static/temporary JSON files
+static
