@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docusense OCR Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-inter">
+    <!-- Main Container -->
+    <div class="min-h-screen py-8 px-4">
+        <!-- Header Section -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 text-center mb-4">
+                Docusense OCR Service
+            </h1>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto">
+                Upload images, PDFs, Word documents, or text files to extract structured data using advanced OCR technology. 
+                All processing happens locally for maximum privacy.
+            </p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Upload Document</h2>
+                
+                <!-- Upload Form -->
+                <form id="uploadForm" class="space-y-4">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                        <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.pdf,.docx,.txt,.csv,.xls,.xlsx" 
+                               class="hidden" onchange="updateFileName()">
+                        <label for="fileInput" class="cursor-pointer">
+                            <div class="space-y-2">
+                                <div class="text-gray-500">
+                                    <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-lg font-medium text-gray-700">Drop files here or click to browse</p>
+                                <p class="text-sm text-gray-500">Supports: PNG, JPG, PDF, DOCX, TXT, CSV, XLS, XLSX (Max 16MB)</p>
+                                <p id="fileName" class="text-sm text-blue-600 font-medium hidden"></p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Advanced OCR Settings -->
+                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-gray-700">Advanced OCR Settings</h3>
+                            <button type="button" id="toggleAdvanced" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Hide Settings
+                            </button>
+                        </div>
+                        
+                        <div id="advancedSettings" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- DPI Settings -->
+                            <div>
+                                <label for="dpiSetting" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Image Quality (DPI)
+                                    <span class="text-xs text-gray-500 ml-1" title="Higher DPI = better accuracy but slower processing">ⓘ</span>
+                                </label>
+                                <select id="dpiSetting" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="low">Low (150 DPI) - Fast</option>
+                                    <option value="medium" selected>Medium (300 DPI) - Balanced</option>
+                                    <option value="high">High (600 DPI) - Best Quality</option>
+                                </select>
+                            </div>
+
+                            <!-- Language Settings -->
+                            <div>
+                                <label for="languageSetting" class="block text-sm font-medium text-gray-700 mb-2">
+                                    OCR Language
+                                    <span class="text-xs text-gray-500 ml-1" title="Select the primary language in your document">ⓘ</span>
+                                </label>
+                                <select id="languageSetting" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="eng" selected>English</option>
+                                    <option value="fra">French</option>
+                                    <option value="deu">German</option>
+                                    <option value="spa">Spanish</option>
+                                    <option value="ita">Italian</option>
+                                    <option value="por">Portuguese</option>
+                                    <option value="rus">Russian</option>
+                                    <option value="chi_sim">Chinese (Simplified)</option>
+                                    <option value="chi_tra">Chinese (Traditional)</option>
+                                    <option value="jpn">Japanese</option>
+                                    <option value="kor">Korean</option>
+                                    <option value="ara">Arabic</option>
+                                    <option value="hin">Hindi</option>
+                                </select>
+                            </div>
+
+                            <!-- OCR Engine Mode -->
+                            <div>
+                                <label for="engineMode" class="block text-sm font-medium text-gray-700 mb-2">
+                                    OCR Engine
+                                    <span class="text-xs text-gray-500 ml-1" title="Combined mode uses both legacy and neural network engines">ⓘ</span>
+                                </label>
+                                <select id="engineMode" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="legacy">Legacy Engine</option>
+                                    <option value="lstm" selected>Neural Network (LSTM) - Recommended</option>
+                                    <option value="combined">Combined</option>
+                                    <option value="default">System Default</option>
+                                </select>
+                            </div>
+
+                            <!-- Page Segmentation Mode -->
+                            <div>
+                                <label for="psmMode" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Page Layout
+                                    <span class="text-xs text-gray-500 ml-1" title="How Tesseract should interpret the page layout">ⓘ</span>
+                                </label>
+                                <select id="psmMode" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="auto">Auto Detect</option>
+                                    <option value="single_column" selected>Single Column - Best for ID Cards</option>
+                                    <option value="single_uniform">Single Block</option>
+                                    <option value="single_text_line">Single Text Line</option>
+                                    <option value="single_word">Single Word</option>
+                                    <option value="sparse_text">Sparse Text</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                        Process Document
+                    </button>
+                </form>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="hidden mt-4 text-center">
+                    <div class="inline-flex items-center px-4 py-2 bg-blue-50 rounded-lg">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-blue-700">Processing document... This may take a few moments</span>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-red-700"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="max-w-4xl mx-auto hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">Processing Results</h2>
+                
+                <!-- Review Section -->
+                <div id="reviewSection" class="mb-8">
+                    <h3 class="text-xl font-medium text-gray-700 mb-4">Document Preview</h3>
+                    <div class="relative border rounded-lg overflow-hidden">
+                        <img id="processedImage" class="max-w-full h-auto" style="display: none;">
+                        <canvas id="highlightCanvas" class="absolute top-0 left-0 pointer-events-none" style="display: none; z-index: 10;"></canvas>
+                        <pre id="textOnlyContent" class="p-4 bg-gray-50 text-sm whitespace-pre-wrap" style="display: none;"></pre>
+                    </div>
+                </div>
+
+                <!-- Output Section -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-medium text-gray-700">Extracted Data</h3>
+                    
+                    <!-- Plain Text Output -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Plain Text</label>
+                        <textarea id="plainTextOutput" readonly 
+                                  class="w-full h-32 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-vertical">
+                        </textarea>
+                    </div>
+
+                    <!-- Structured JSON Output -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Structured JSON</label>
+                        <textarea id="jsonOutput" readonly 
+                                  class="w-full h-48 p-3 border border-gray-300 rounded-lg bg-gray-50 resize-vertical font-mono text-sm">
+                        </textarea>
+                    </div>
+
+                    <!-- Download Button -->
+                    <div class="text-center">
+                        <button id="downloadJsonBtn" 
+                                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                            Download JSON Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File name display function
+        function updateFileName() {
+            const fileInput = document.getElementById('fileInput');
+            const fileName = document.getElementById('fileName');
+            
+            if (fileInput.files.length > 0) {
+                fileName.textContent = `Selected: ${fileInput.files[0].name}`;
+                fileName.classList.remove('hidden');
+            } else {
+                fileName.classList.add('hidden');
+            }
+        }
+
+        // Get references to DOM elements
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Advanced settings elements
+        const toggleAdvanced = document.getElementById('toggleAdvanced');
+        const advancedSettings = document.getElementById('advancedSettings');
+        const dpiSetting = document.getElementById('dpiSetting');
+        const languageSetting = document.getElementById('languageSetting');
+        const engineMode = document.getElementById('engineMode');
+        const psmMode = document.getElementById('psmMode');
+        
+        // Toggle advanced settings visibility
+        toggleAdvanced.addEventListener('click', function() {
+            if (advancedSettings.style.display === 'none') {
+                advancedSettings.style.display = 'grid';
+                toggleAdvanced.textContent = 'Hide Settings';
+            } else {
+                advancedSettings.style.display = 'none';
+                toggleAdvanced.textContent = 'Show Settings';
+            }
+        });
+
+        // Handle form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Check if file is selected
+            if (!fileInput.files.length) {
+                showError('Please select a file to upload');
+                return;
+            }
+
+            // Show loading indicator and hide previous results/errors
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+
+            // Create FormData and append file
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('dpi_setting', dpiSetting.value);
+            formData.append('language', languageSetting.value);
+            formData.append('engine_mode', engineMode.value);
+            formData.append('psm_mode', psmMode.value);
+
+            try {
+                // Send file to backend
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Display successful results
+                    displayResults(result);
+                } else {
+                    // Show error from backend
+                    showError(result.message || result.error || 'Processing failed');
+                }
+            } catch (error) {
+                // Handle network or other errors
+                showError('Upload failed. Please check your connection and try again.');
+            } finally {
+                // Hide loading indicator
+                loadingIndicator.classList.add('hidden');
+            }
+        });
+
+        // Function to show error messages
+        function showError(message) {
+            errorMessage.querySelector('p').textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        // Function to display processing results
+        function displayResults(result) {
+            // Show results section
+            resultsSection.classList.remove('hidden');
+            
+            const processedImage = document.getElementById('processedImage');
+            const highlightCanvas = document.getElementById('highlightCanvas');
+            const textOnlyContent = document.getElementById('textOnlyContent');
+            const plainTextOutput = document.getElementById('plainTextOutput');
+            const jsonOutput = document.getElementById('jsonOutput');
+
+            // Check if this is text-only content (DOCX/TXT)
+            if (result.data && result.data.text_only) {
+                // Hide image elements and show text content
+                processedImage.style.display = 'none';
+                highlightCanvas.style.display = 'none';
+                textOnlyContent.style.display = 'block';
+                textOnlyContent.textContent = result.data.text_only;
+                
+                // Populate text outputs
+                plainTextOutput.value = result.data.text_only;
+                jsonOutput.value = JSON.stringify(result, null, 2);
+            } else if (result.data && Array.isArray(result.data)) {
+                // Process image/PDF with bounding boxes
+                textOnlyContent.style.display = 'none';
+                
+                // Use converted image for PDFs, original filename for images
+                const imageFilename = result.converted_image || result.converted_images?.[0] || result.filename;
+                
+                // Set up image load handler first
+                processedImage.onload = function() {
+                    setTimeout(() => setupCanvas(result.data), 100); // Small delay to ensure DOM is ready
+                };
+                
+                // Reset previous image and canvas state
+                processedImage.style.display = 'none';
+                highlightCanvas.style.display = 'none';
+                
+                // Set image source and show it
+                processedImage.src = '/uploads/' + imageFilename + '?t=' + Date.now(); // Cache busting
+                processedImage.style.display = 'block';
+                
+                // Handle case where image is already cached
+                if (processedImage.complete && processedImage.naturalWidth > 0) {
+                    setTimeout(() => setupCanvas(result.data), 100);
+                }
+                
+                // Populate text outputs
+                const plainText = result.data.map(item => item.text).join(' ');
+                plainTextOutput.value = plainText;
+                jsonOutput.value = JSON.stringify(result, null, 2);
+            }
+        }
+
+        // Function to set up canvas with bounding boxes
+        function setupCanvas(ocrData) {
+            const processedImage = document.getElementById('processedImage');
+            const highlightCanvas = document.getElementById('highlightCanvas');
+
+            // Ensure image has loaded and has dimensions
+            if (processedImage.naturalWidth === 0 || processedImage.clientWidth === 0) {
+                setTimeout(() => setupCanvas(ocrData), 100);
+                return;
+            }
+
+            const ctx = highlightCanvas.getContext('2d');
+
+            // Set canvas size to match displayed image exactly
+            const displayWidth = processedImage.clientWidth;
+            const displayHeight = processedImage.clientHeight;
+            
+            // DEBUGGING: Log exact dimensions and positioning
+            console.log('🔍 MAIN APP COORDINATE DEBUG:');
+            console.log(`  Image Natural: ${processedImage.naturalWidth} x ${processedImage.naturalHeight}`);
+            console.log(`  Image Display: ${displayWidth} x ${displayHeight}`);
+            console.log(`  Image Offset: ${processedImage.offsetLeft}, ${processedImage.offsetTop}`);
+            console.log(`  Container: ${processedImage.parentElement.clientWidth} x ${processedImage.parentElement.clientHeight}`);
+            
+            highlightCanvas.width = displayWidth;
+            highlightCanvas.height = displayHeight;
+            highlightCanvas.style.width = displayWidth + 'px';
+            highlightCanvas.style.height = displayHeight + 'px';
+            highlightCanvas.style.display = 'block';
+            
+            console.log(`  Canvas Size: ${highlightCanvas.width} x ${highlightCanvas.height}`);
+            console.log(`  Canvas Style: ${highlightCanvas.style.width} x ${highlightCanvas.style.height}`);
+
+            // Calculate scaling factors from OCR coordinates to display coordinates
+            const scaleX = displayWidth / processedImage.naturalWidth;
+            const scaleY = displayHeight / processedImage.naturalHeight;
+            
+            console.log(`  Scale Factors: X=${scaleX.toFixed(6)}, Y=${scaleY.toFixed(6)}`);
+            console.log(`  OCR Data Items: ${ocrData.length}`);
+
+            // Clear canvas and set styles
+            ctx.clearRect(0, 0, displayWidth, displayHeight);
+            ctx.fillStyle = 'rgba(255, 235, 59, 0.4)'; // Bright yellow highlight - more visible
+            ctx.strokeStyle = 'rgba(255, 193, 7, 0.8)'; // Yellow-orange border
+            ctx.lineWidth = 2; // Thicker border for visibility
+
+            // Filter and draw bounding boxes for items with text
+            let drawnBoxes = 0;
+            console.log('🎯 COORDINATE TRANSFORMATIONS:');
+            ocrData.forEach((item, index) => {
+                if (item.text && item.text.trim() && 
+                    typeof item.left === 'number' && 
+                    typeof item.top === 'number' && 
+                    typeof item.width === 'number' && 
+                    typeof item.height === 'number') {
+                    
+                    const x = Math.round(item.left * scaleX);
+                    const y = Math.round(item.top * scaleY);
+                    const width = Math.round(item.width * scaleX);
+                    const height = Math.round(item.height * scaleY);
+                    
+                    // Log first 5 transformations for debugging
+                    if (index < 5) {
+                        console.log(`  ${index}: "${item.text.substring(0, 10)}" OCR(${item.left}, ${item.top}) → Canvas(${x}, ${y}) size(${width}x${height})`);
+                    }
+                    
+                    // Only draw reasonable sized boxes
+                    if (width > 2 && height > 2) {
+                        ctx.fillRect(x, y, width, height);
+                        ctx.strokeRect(x, y, width, height);
+                        drawnBoxes++;
+                    }
+                }
+            });
+            
+            console.log(`🎯 FINAL RESULT: ${drawnBoxes} boxes drawn on canvas`);
+        }
+
+        // Download JSON functionality
+        document.getElementById('downloadJsonBtn').addEventListener('click', function() {
+            const jsonContent = document.getElementById('jsonOutput').value;
+            
+            if (!jsonContent.trim()) {
+                showError('No data available to download');
+                return;
+            }
+
+            // Create blob and download
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'extracted_data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
