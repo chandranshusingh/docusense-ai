@@ -27,8 +27,8 @@ git add .
 # Create initial commit
 git commit -m "Initial commit: Docusense OCR Prototype with advanced OCR settings and REST API"
 
-# Connect to GitHub repository (replace USERNAME and REPOSITORY)
-git remote add origin https://github.com/USERNAME/REPOSITORY.git
+# Connect to GitHub repository 
+git remote add origin https://github.com/chandranshusingh/docusense-ai.git
 
 # Push to GitHub
 git branch -M main
@@ -128,7 +128,7 @@ Consider creating a screenshot of the web interface to use as the social preview
 ### Reporting Security Issues
 If you discover security vulnerabilities:
 1. **Do NOT** open public issues for security problems
-2. **Email** the maintainers directly (add contact info)
+2. **Email** the maintainers directly at: chandranshu.singh@outlook.com
 3. **Provide** detailed description and reproduction steps
 4. **Allow** reasonable time for fixes before disclosure
 
